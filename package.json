@@ -15,5 +15,11 @@
   "homepage": "https://github.com/calesennett/pi-codex-usage#readme",
   "bugs": {
     "url": "https://github.com/calesennett/pi-codex-usage/issues"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "jiti": "^2.7.0"
   }
 }

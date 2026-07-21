@@ -32,6 +32,14 @@ class CodexUsageStatus {
 		return this.ctx !== undefined && this.generation === generation;
 	}
 
+	private getModelId(ctx?: ExtensionContext): string | undefined {
+		try {
+			return ctx?.model?.id;
+		} catch {
+			return undefined;
+		}
+	}
+
 	private start(ctx: ExtensionContext): void {
 		this.generation++;
 		this.ctx = ctx;
@@ -42,7 +50,8 @@ class CodexUsageStatus {
 		const generation = this.generation;
 		void (async () => {
 			await this.loadUsageMode(ctx, generation);
-			await this.refresh(ctx, ctx.model?.id, generation);
+			if (!this.isCurrent(generation)) return;
+			await this.refresh(ctx, this.getModelId(ctx), generation);
 		})();
 	}
 
@@ -77,7 +86,7 @@ class CodexUsageStatus {
 		}
 	}
 
-	private async refresh(ctx = this.ctx, modelId = ctx?.model?.id, generation = this.generation): Promise<void> {
+	private async refresh(ctx = this.ctx, modelId = this.getModelId(ctx), generation = this.generation): Promise<void> {
 		if (!ctx?.hasUI || !this.isCurrent(generation)) return;
 
 		if (this.inFlight) {
@@ -109,7 +118,7 @@ class CodexUsageStatus {
 
 	private renderLast(ctx: ExtensionContext): boolean {
 		if (!ctx.hasUI || !this.lastUsage) return false;
-		ctx.ui.setStatus(EXTENSION_ID, formatStatus(ctx, this.lastUsage, this.usageMode, ctx.model?.id));
+		ctx.ui.setStatus(EXTENSION_ID, formatStatus(ctx, this.lastUsage, this.usageMode, this.getModelId(ctx)));
 		return true;
 	}
 
